@@ -1,5 +1,7 @@
 import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
+import { getDatabaseConnection } from '../database/connection'
+import { Database } from 'sqlite'
 
 const HTTP_OK: number = 200
 const HTTP_CREATE: number = 201
@@ -11,20 +13,20 @@ interface User {
     age: number;
 }
 
-const users: User[] = [
-    { id: uuidv4(), name: "Daniel", age: 45 },
-    { id: uuidv4(), name: "Lucas", age: 20 },
-]
-
 class UserController {
 
-    index(req: Request, res: Response) {
+    async index(req: Request, res: Response) {
+
+        const db: Database = await getDatabaseConnection()
+
+        const users = await db.all<User[]>('SELECT * FROM users')
+
         return res.status(HTTP_OK).json(users)
     }
 
-    store(req: Request, res: Response) {
+    async store(req: Request, res: Response) {
 
-        const { name, age }: User = req.body
+        const { name, age } = req.body
 
         if (!name || !age) {
             return res.status(HTTP_BAD_REQUEST).json({
@@ -38,7 +40,9 @@ class UserController {
             age,
         }
 
-        users.push(newUser)
+        const db: Database = await getDatabaseConnection()
+
+        await db.run('INSERT INTO users (id, name, age) VALUES (?, ?, ?)', [newUser.id, newUser.name, newUser.age])
 
         return res.status(HTTP_CREATE).json(newUser)
 
