@@ -1,0 +1,1 @@
+# estudo-dirigido-pelo-gemini
