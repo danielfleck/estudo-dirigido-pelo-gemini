@@ -1,0 +1,33 @@
+{
+  "name": "estudo-dirigido-pelo-gemini",
+  "version": "1.0.0",
+  "description": "API REST com Node.js e TypeScript",
+  "main": "src/server.ts",
+  "scripts": {
+    "dev": "tsx --watch src/server.ts",
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/danielfleck/estudo-dirigido-pelo-gemini.git"
+  },
+  "keywords": [],
+  "author": "Daniel Rodrigo Fleck",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/danielfleck/estudo-dirigido-pelo-gemini/issues"
+  },
+  "homepage": "https://github.com/danielfleck/estudo-dirigido-pelo-gemini#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.1.0",
+    "@types/uuid": "^10.0.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "uuid": "^13.0.0"
+  }
+}
