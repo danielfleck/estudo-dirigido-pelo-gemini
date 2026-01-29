@@ -20,11 +20,14 @@
   },
   "homepage": "https://github.com/danielfleck/estudo-dirigido-pelo-gemini#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^25.1.0",
+    "@types/sqlite3": "^3.1.11",
     "@types/uuid": "^10.0.0",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
