@@ -1,7 +1,9 @@
 import 'dotenv/config' // Deve ser a primeira linha
 import express, { Request, Response } from 'express'
-import routes from './routes'
+import routes from './routes/index'
 import { setupDatabase } from './database/setup'
+import swaggerUi from 'swagger-ui-express' // Importação da UI
+import { swaggerDocument } from './swagger' // Importação do arquivo de configuração
 
 const app = express()
 
@@ -9,6 +11,11 @@ const HTTP_NOT_FOUND: number = 404
 const PORT = process.env.PORT || 3000
 
 app.use(express.json())
+
+// --- ROTA DA DOCUMENTAÇÃO ---
+// Acessível em: http://localhost:3000/api-docs
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
+
 app.use(routes)
 
 app.use((req: Request, res: Response) => {
