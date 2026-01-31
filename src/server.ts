@@ -1,59 +1,33 @@
-import "dotenv/config"
+import 'dotenv/config' // Deve ser a primeira linha
 import express, { Request, Response } from 'express'
 import routes from './routes'
-import { getDatabaseConnection } from './database/connection'
+import { setupDatabase } from './database/setup'
 
 const app = express()
 
 const HTTP_NOT_FOUND: number = 404
+const PORT = process.env.PORT || 3000
 
 app.use(express.json())
 app.use(routes)
 
-async function initializeDatabase() {
-    // 1. Obtém a instância do banco
-    const db = await getDatabaseConnection()
+app.use((req: Request, res: Response) => {
+    return res.status(HTTP_NOT_FOUND).json({ error: 'Rota não encontrada' })
+})
 
-    // 2. CORREÇÃO TÉCNICA: Usar db.exec para criação de tabelas (DDL)
-    // db.exec é ideal para rodar scripts de estrutura, enquanto db.run é para queries parametrizadas (?, ?)
-    await new Promise<void>((resolve, reject) => {
+// Função de Boot
+async function startServer() {
+    // 1. Configura o banco primeiro
+    await setupDatabase()
 
-        const sql = `
-            CREATE TABLE IF NOT EXISTS users (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL,
-                age INTEGER NOT NULL
-            );
-        `
-
-        db.run(sql, (error: Error | null) => {
-            if (error) {
-                console.error("❌ Erro ao criar tabela:", error)
-                reject(error)
-            } else {
-                resolve()
-            }
-        })
+    // 2. Sobe o servidor
+    const server = app.listen(PORT, () => {
+        console.log(`🚀 Servidor rodando na porta ${PORT}`)
     })
 
-    console.log("📦 Tabela 'users' verificada/criada com sucesso")
+    server.on("error", (error: any) => {
+        console.error("Erro no servidor:", error.code)
+    })
 }
 
-app.use((req: Request, res: Response) => {
-    return res.status(HTTP_NOT_FOUND).send()
-})
-
-// Inicialização segura
-initializeDatabase().then(() => {
-
-    const server = app.listen(process.env.PORT, () => {
-        console.log(`🚀 Servidor ouvindo na porta ${process.env.PORT}`)
-    })
-
-    server.on("error", (error: NodeJS.ErrnoException) => {
-        console.log(error.code)
-    })
-
-}).catch(err => {
-    console.error("Erro fatal na inicialização:", err)
-})
+startServer()

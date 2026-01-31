@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { getDatabaseConnection } from '../database/connection'
+import { db } from '../database/connection'
 
 export interface User {
     id: string;
@@ -9,76 +9,41 @@ export interface User {
 
 export class UserRepository {
 
-    // Método para SALVAR
     async create(name: string, age: number): Promise<User> {
-        const db = await getDatabaseConnection()
         const id = uuidv4()
 
-        return new Promise((resolve, reject) => {
-            const sql = 'INSERT INTO users (id, name, age) VALUES (?, ?, ?)'
+        // NO POSTGRES: Usamos $1, $2, $3... em vez de ?
+        const sql = 'INSERT INTO users (id, name, age) VALUES ($1, $2, $3)'
 
-            // O driver nativo exige callback
-            db.run(sql, [id, name, age], (error: Error | null) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve({ id, name, age })
-                }
-            })
-        })
+        await db.query(sql, [id, name, age])
+
+        return { id, name, age }
     }
 
-    // Método para LISTAR TODOS
     async findAll(): Promise<User[]> {
-        const db = await getDatabaseConnection()
+        const sql = 'SELECT * FROM users'
 
-        return new Promise((resolve, reject) => {
-            const sql = 'SELECT * FROM users'
+        const result = await db.query<User>(sql)
 
-            db.all(sql, (error: Error | null, rows: any[]) => {
-                if (error) {
-                    reject(error)
-                } else {
-                    // Forçamos o tipo do retorno do banco para nossa Interface
-                    resolve(rows as User[])
-                }
-            })
-        })
+        // O resultado real fica dentro de .rows
+        return result.rows
     }
 
-    // Método para ATUALIZAR
     async update(id: string, name: string, age: number): Promise<boolean> {
-        const db = await getDatabaseConnection()
+        const sql = 'UPDATE users SET name = $1, age = $2 WHERE id = $3'
 
-        return new Promise((resolve, reject) => {
-            const sql = 'UPDATE users SET name = ?, age = ? WHERE id = ?'
+        const result = await db.query(sql, [name, age, id])
 
-            // Usamos 'function' (não arrow) para ter acesso ao 'this.changes'
-            db.run(sql, [name, age, id], function (this: any, error: Error | null) {
-                if (error) {
-                    reject(error)
-                } else {
-                    // this.changes indica quantas linhas foram afetadas
-                    resolve(this.changes > 0)
-                }
-            })
-        })
+        // .rowCount diz quantas linhas foram afetadas
+        // (result.rowCount ?? 0) garante que seja número mesmo se vier null
+        return (result.rowCount ?? 0) > 0
     }
 
-    // Método para DELETAR
     async delete(id: string): Promise<boolean> {
-        const db = await getDatabaseConnection()
+        const sql = 'DELETE FROM users WHERE id = $1'
 
-        return new Promise((resolve, reject) => {
-            const sql = 'DELETE FROM users WHERE id = ?'
+        const result = await db.query(sql, [id])
 
-            db.run(sql, [id], function (this: any, error: Error | null) {
-                if (error) {
-                    reject(error)
-                } else {
-                    resolve(this.changes > 0)
-                }
-            })
-        })
+        return (result.rowCount ?? 0) > 0
     }
 }
