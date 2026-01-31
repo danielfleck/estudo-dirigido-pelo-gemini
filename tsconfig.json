@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "target": "ES2020", // Versão do JS que será gerada
-    "module": "ESNext", // Usa import/export modernos
-    "moduleResolution": "node", // Padrão do Node.js
-    "esModuleInterop": true, // Permite importar pacotes antigos (CommonJS)
-    "forceConsistentCasingInFileNames": true, // Diferencia Maiúsculas de minúsculas
-    "strict": true, // Ativa o "Supervisor Rigoroso" (Sem 'any' implícito)
-    "skipLibCheck": true, // Otimiza a compilação
-    "outDir": "./dist", // Onde o código compilado vai ficar (se fizermos build)
-    "rootDir": "./src" // Onde nosso código fonte vive
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    // ONDE A MÁGICA ACONTECE:
+    "outDir": "./dist", // Os arquivos .js vão para esta pasta
+    "rootDir": "./src" // O compilador lê desta pasta
   },
   "include": [
     "src/**/*"

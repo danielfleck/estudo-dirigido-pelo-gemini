@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid'
-import { db } from '../database/connection'
+import { db } from '../database/connection.js'
 
 export interface User {
     id: string;

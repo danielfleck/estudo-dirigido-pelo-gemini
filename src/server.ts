@@ -1,9 +1,9 @@
 import 'dotenv/config' // Deve ser a primeira linha
 import express, { Request, Response } from 'express'
-import routes from './routes/index'
-import { setupDatabase } from './database/setup'
+import routes from './routes/index.js'
+import { setupDatabase } from './database/setup.js'
 import swaggerUi from 'swagger-ui-express' // Importação da UI
-import { swaggerDocument } from './swagger' // Importação do arquivo de configuração
+import { swaggerDocument } from './swagger.js' // Importação do arquivo de configuração
 
 const app = express()
 

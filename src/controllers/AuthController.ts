@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import AuthService from '../services/AuthService'
+import AuthService from '../services/AuthService.js'
 
 const HTTP_OK = 200
 const HTTP_BAD_REQUEST = 400

@@ -1,6 +1,6 @@
 import { compare } from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { UserRepository } from '../repositories/UserRepository'
+import { UserRepository } from '../repositories/UserRepository.js'
 
 const userRepository = new UserRepository()
 

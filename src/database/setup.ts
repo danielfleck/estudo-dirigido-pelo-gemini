@@ -1,4 +1,4 @@
-import { db } from './connection'
+import { db } from './connection.js'
 
 export async function setupDatabase() {
     try {

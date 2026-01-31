@@ -5,7 +5,8 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "tsc-watch --noEmit --onSuccess \"tsx src/server.ts\"",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "repository": {
     "type": "git",

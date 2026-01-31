@@ -1,4 +1,4 @@
-import { UserRepository } from '../repositories/UserRepository';
+import { UserRepository } from '../repositories/UserRepository.js';
 import { hash } from 'bcryptjs' // Importamos a função de criptografia
 
 const userRepository = new UserRepository();

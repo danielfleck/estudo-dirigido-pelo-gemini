@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
-import UserService from '../services/UserService' // Importa o Service
-import { UserSchema } from '../schemas/UserSchema' // Importamos o esquema
+import UserService from '../services/UserService.js' // Importa o Service
+import { UserSchema } from '../schemas/UserSchema.js' // Importamos o esquema
 import { z } from 'zod'
 
 // Constantes HTTP
