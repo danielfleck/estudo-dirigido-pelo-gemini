@@ -11,7 +11,8 @@ export async function setupDatabase() {
             CREATE TABLE IF NOT EXISTS users (
                 id VARCHAR(36) PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
-                age INTEGER NOT NULL
+                age INTEGER NOT NULL,
+                password VARCHAR(255) NOT NULL
             );
         `
 

@@ -5,23 +5,24 @@ export interface User {
     id: string;
     name: string;
     age: number;
+    password: string;
 }
 
 export class UserRepository {
 
-    async create(name: string, age: number): Promise<User> {
+    // Agora aceitamos password
+    async create(name: string, age: number, passwordHash: string): Promise<User> {
         const id = uuidv4()
 
-        // NO POSTGRES: Usamos $1, $2, $3... em vez de ?
-        const sql = 'INSERT INTO users (id, name, age) VALUES ($1, $2, $3)'
+        const sql = 'INSERT INTO users (id, name, age, password) VALUES ($1, $2, $3, $4)'
 
-        await db.query(sql, [id, name, age])
+        await db.query(sql, [id, name, age, passwordHash])
 
-        return { id, name, age }
+        return { id, name, age, password: passwordHash }
     }
 
     async findAll(): Promise<User[]> {
-        const sql = 'SELECT * FROM users'
+        const sql = 'SELECT id, name, age FROM users'
 
         const result = await db.query<User>(sql)
 
@@ -45,5 +46,17 @@ export class UserRepository {
         const result = await db.query(sql, [id])
 
         return (result.rowCount ?? 0) > 0
+    }
+
+    // --- NOVO MÉTODO PARA LOGIN ---
+    // Precisamos buscar pelo nome para conferir a senha depois
+    async findByName(name: string): Promise<User | null> {
+        // Aqui precisamos selecionar a SENHA também, pois precisaremos dela para o login
+        const sql = 'SELECT * FROM users WHERE name = $1 LIMIT 1'
+
+        const result = await db.query<User>(sql, [name])
+
+        // Se achou, retorna o primeiro. Se não, retorna null.
+        return result.rows[0] || null
     }
 }

@@ -5,6 +5,7 @@ import { z } from 'zod'
 export interface UserDTO {
     name: string;
     age: number;
+    password: string;
 }
 
 // 2. SCHEMA TIPADO (Implementação)
@@ -18,7 +19,10 @@ export const UserSchema: z.ZodType<UserDTO> = z.object({
     age: z
         .number({ message: "A idade é obrigatória e deve ser um número" })
         .int({ message: "A idade deve ser um número inteiro" })
-        .min(0, { message: "A idade não pode ser negativa" })
+        .min(0, { message: "A idade não pode ser negativa" }),
+    password: z
+        .string({ message: "A senha é obrigatória e deve ser uma string" })
+        .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
 })
 
 // Para facilitar a importação em outros lugares, mantemos o alias 'UserData'

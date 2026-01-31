@@ -30,7 +30,11 @@ export class UserController {
             const validatedData = UserSchema.parse(req.body)
 
             // 2. Passamos os dados garantidos para o Service
-            const newUser = await UserService.create(validatedData.name, validatedData.age)
+            const newUser = await UserService.create(
+                validatedData.name,
+                validatedData.age,
+                validatedData.password
+            )
 
             return res.status(HTTP_CREATED).json(newUser)
 
