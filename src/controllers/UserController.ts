@@ -1,15 +1,12 @@
 import { Request, Response } from 'express'
-import { UserRepository } from '../repositories/UserRepository'
+import UserService from '../services/UserService'
 
 const HTTP_OK: number = 200
-const HTTP_CREATE: number = 201
+const HTTP_CREATED: number = 201
 const HTTP_NO_CONTENT: number = 204
 const HTTP_BAD_REQUEST: number = 400
 const HTTP_NOT_FOUND: number = 404
 const HTTP_INTERNAL_SERVER_ERROR: number = 500
-
-// Instanciamos o repositório
-const userRepository = new UserRepository()
 
 export class UserController {
 
@@ -18,7 +15,7 @@ export class UserController {
         try {
             // O Controller apenas pede: "Me traga todos"
             // Ele não sabe se veio do SQLite ou da Lua.
-            const users = await userRepository.findAll()
+            const users = await UserService.findAll()
 
             return res.status(HTTP_OK).json(users)
         } catch (error) {
@@ -37,9 +34,9 @@ export class UserController {
 
         try {
             // O Controller apenas ordena: "Crie este usuário"
-            const newUser = await userRepository.create(name, age)
+            const newUser = await UserService.create(name, age)
 
-            return res.status(HTTP_CREATE).json(newUser)
+            return res.status(HTTP_CREATED).json(newUser)
         } catch (error) {
             console.error(error)
             return res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: 'Erro ao criar usuário' })
@@ -56,7 +53,7 @@ export class UserController {
         }
 
         try {
-            const sucesso = await userRepository.update(id, name, age)
+            const sucesso = await UserService.update(id, name, age)
 
             if (sucesso) {
                 // Se atualizou, devolvemos os dados novos
@@ -74,9 +71,9 @@ export class UserController {
         const id = req.params.id as string
 
         try {
-            const sucesso = await userRepository.delete(id)
+            const sucess = await UserService.delete(id)
 
-            if (sucesso) {
+            if (sucess !== null) {
                 // 204 No Content: Deu certo, mas não tenho nada pra te mostrar (ele sumiu)
                 return res.status(HTTP_NO_CONTENT).send()
             } else {
