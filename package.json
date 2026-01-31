@@ -16,6 +16,9 @@
   "author": "Daniel Rodrigo Fleck",
   "license": "ISC",
   "type": "module",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "bugs": {
     "url": "https://github.com/danielfleck/estudo-dirigido-pelo-gemini/issues"
   },
