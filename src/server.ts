@@ -1,12 +1,10 @@
+import "dotenv/config"
 import express, { Request, Response } from 'express'
 import routes from './routes'
-// Certifique-se de que o nome da função no import bate com o que está no arquivo connection.ts
-// Antes chamamos de 'connect', aqui você usou 'getDatabaseConnection'. Ajuste conforme seu arquivo.
 import { getDatabaseConnection } from './database/connection'
 
 const app = express()
 
-const PORT: number = 3000
 const HTTP_NOT_FOUND: number = 404
 
 app.use(express.json())
@@ -48,8 +46,8 @@ app.use((req: Request, res: Response) => {
 // Inicialização segura
 initializeDatabase().then(() => {
 
-    const server = app.listen(PORT, () => {
-        console.log(`🚀 Servidor ouvindo na porta ${PORT}`)
+    const server = app.listen(process.env.PORT, () => {
+        console.log(`🚀 Servidor ouvindo na porta ${process.env.PORT}`)
     })
 
     server.on("error", (error: NodeJS.ErrnoException) => {

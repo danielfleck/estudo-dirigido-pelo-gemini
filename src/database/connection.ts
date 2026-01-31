@@ -7,7 +7,7 @@ export async function getDatabaseConnection(): Promise<Database> {
     return new Promise((resolve, reject) => {
         // 2. Usamos o driver nativo 'sqlite3.Database'
         // Ele tenta abrir o arquivo. Se não existir, cria.
-        const db = new sqlite3.Database('./database.sqlite', (error) => {
+        const db = new sqlite3.Database(process.env.DATABASE_PATH as string, (error) => {
             if (error) {
                 console.error("❌ Erro ao conectar no SQLite:", error)
                 reject(error)
