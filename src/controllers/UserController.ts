@@ -1,104 +1,92 @@
 import { Request, Response } from 'express'
-import { v4 as uuidv4 } from 'uuid'
-import { getDatabaseConnection } from '../database/connection'
-import { Database } from 'sqlite'
+import { UserRepository } from '../repositories/UserRepository'
 
 const HTTP_OK: number = 200
 const HTTP_CREATE: number = 201
 const HTTP_NO_CONTENT: number = 204
 const HTTP_BAD_REQUEST: number = 400
 const HTTP_NOT_FOUND: number = 404
+const HTTP_INTERNAL_SERVER_ERROR: number = 500
 
-interface User {
-    id: string;
-    name: string;
-    age: number;
-}
+// Instanciamos o repositório
+const userRepository = new UserRepository()
 
-class UserController {
+export class UserController {
 
     async index(req: Request, res: Response) {
 
-        const db: Database = await getDatabaseConnection()
+        try {
+            // O Controller apenas pede: "Me traga todos"
+            // Ele não sabe se veio do SQLite ou da Lua.
+            const users = await userRepository.findAll()
 
-        const users = await db.all<User[]>('SELECT * FROM users')
-
-        return res.status(HTTP_OK).json(users)
+            return res.status(HTTP_OK).json(users)
+        } catch (error) {
+            console.error(error)
+            return res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: 'Erro ao buscar usuários' })
+        }
     }
 
     async store(req: Request, res: Response) {
-
         const { name, age } = req.body
 
+        // Validação (Regra de Negócio continua aqui)
         if (!name || !age) {
-            return res.status(HTTP_BAD_REQUEST).json({
-                message: "Name and age are required"
-            })
+            return res.status(HTTP_BAD_REQUEST).json({ error: 'Nome e idade são obrigatórios' })
         }
 
-        const newUser: User = {
-            id: uuidv4(),
-            name,
-            age,
+        try {
+            // O Controller apenas ordena: "Crie este usuário"
+            const newUser = await userRepository.create(name, age)
+
+            return res.status(HTTP_CREATE).json(newUser)
+        } catch (error) {
+            console.error(error)
+            return res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: 'Erro ao criar usuário' })
         }
-
-        const db: Database = await getDatabaseConnection()
-
-        await db.run('INSERT INTO users (id, name, age) VALUES (?, ?, ?)', [newUser.id, newUser.name, newUser.age])
-
-        return res.status(HTTP_CREATE).json(newUser)
-
     }
 
     async update(req: Request, res: Response) {
-
-        const { id } = req.params
+        // O ID vem da URL (ex: /users/123) -> req.params
+        const id = req.params.id as string
         const { name, age } = req.body
 
         if (!name || !age) {
-            return res.status(HTTP_BAD_REQUEST).json({
-                message: "Name and age are required"
-            })
+            return res.status(HTTP_BAD_REQUEST).json({ error: 'Nome e idade são obrigatórios para atualização' })
         }
 
-        const db: Database = await getDatabaseConnection()
+        try {
+            const sucesso = await userRepository.update(id, name, age)
 
-        const result = await db.run(
-            'UPDATE users SET name = ?, age = ? WHERE id = ?',
-            [name, age, id]
-        )
-
-        if (result.changes === 0) {
-            return res.status(HTTP_NOT_FOUND).json({
-                error: "User not found"
-            })
+            if (sucesso) {
+                // Se atualizou, devolvemos os dados novos
+                return res.status(HTTP_OK).json({ id, name, age })
+            } else {
+                return res.status(HTTP_NOT_FOUND).json({ error: 'Usuário não encontrado' })
+            }
+        } catch (error) {
+            console.error(error)
+            return res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: 'Erro ao atualizar usuário' })
         }
-
-        return res.status(HTTP_OK).json({ id, name, age })
-
     }
 
     async delete(req: Request, res: Response) {
+        const id = req.params.id as string
 
-        const { id } = req.params
+        try {
+            const sucesso = await userRepository.delete(id)
 
-        const db: Database = await getDatabaseConnection()
-
-        const result = await db.run(
-            'DELETE FROM users WHERE id = ?',
-            [id]
-        )
-
-        if (result.changes === 0) {
-            return res.status(HTTP_NOT_FOUND).json({
-                error: "User not found"
-            })
+            if (sucesso) {
+                // 204 No Content: Deu certo, mas não tenho nada pra te mostrar (ele sumiu)
+                return res.status(HTTP_NO_CONTENT).send()
+            } else {
+                return res.status(HTTP_NOT_FOUND).json({ error: 'Usuário não encontrado' })
+            }
+        } catch (error) {
+            console.error(error)
+            return res.status(HTTP_INTERNAL_SERVER_ERROR).json({ error: 'Erro ao deletar usuário' })
         }
-
-        return res.status(HTTP_NO_CONTENT).send()
-
     }
-
 }
 
-export default new UserController
+export default new UserController()
